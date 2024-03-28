@@ -1,0 +1,164 @@
+#database creation and configuration
+Open mysql in shell, then write: 
+mysql –u root –p(then press Enter)
+Create database bityeartwo2024
+CREATE USER 'admin'@'localhost' IDENTIFIED BY bityear2@2024';
+GRANT ALL PRIVILEGES ON bityeartwo2024.* TO 'admin'@'localhost';
+FLUSH PRIVILEGES;
+Login a the new user and write: use bityeartwo2024;
+
+#createion of the user table
+CREATE TABLE person (
+    id INT PRIMARY KEY,
+    firstname VARCHAR(50),
+    lastname VARCHAR(50),
+    address VARCHAR(255),
+    city VARCHAR(100)
+);
+
+#Insert data into database
+<?php
+
+// Database connection details
+$servername = "YOUR_HOST";
+$username = "YOUR_USERNAME";
+$password = "YOUR_PASSWORD";
+$database = "YOUR_DATABASE";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Prepare and bind parameters
+    $stmt = $conn->prepare("INSERT INTO person (firstname, lastname, address, city) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $firstname, $lastname, $address, $city);
+
+    // Set parameters and execute
+    $firstname = $_POST['firstname'];
+    $lastname = $_POST['lastname'];
+    $address = $_POST['address'];
+    $city = $_POST['city'];
+
+    if ($stmt->execute() === TRUE) {
+        echo "New record created successfully";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Person</title>
+</head>
+
+<body>
+    <h2>Add Person</h2>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        First Name: <input type="text" name="firstname"><br>
+        Last Name: <input type="text" name="lastname"><br>
+        Address: <input type="text" name="address"><br>
+        City: <input type="text" name="city"><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+
+</html>
+
+
+
+#retrieve data from the database to the table;
+<?php
+
+// Database connection details
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "bit2024";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// SQL query to retrieve data from the person table
+$sql = "SELECT id, firstname, lastname, address, city FROM person";
+$result = $conn->query($sql);
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Person Data</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Person Data</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Address</th>
+            <th>City</th>
+        </tr>
+        <?php
+        // Output data of each row
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr><td>" . $row["id"] . "</td><td>" . $row["firstname"] . "</td><td>" . $row["lastname"] . "</td><td>" . $row["address"] . "</td><td>" . $row["city"] . "</td></tr>";
+            }
+        } else {
+            echo "<tr><td colspan='5'>No data found</td></tr>";
+        }
+        ?>
+    </table>
+</body>
+
+</html>
+
+<?php
+// Close connection
+$conn->close();
+?>
+
+
+
+

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message</title>
+</head>
+
+<body>
+    <h2>Send Message</h2>
+    <form action="send_message.php" method="post">
+        <label>Receiver:</label><br>
+        <select name="receiver_id" required>
+            <?php
+            // Connect to database (replace dbname, username, password with actual credentials)
+            $connection = new mysqli("localhost", "root", "", "mytest");
+
+            if ($connection->connect_error) {
+                die("Connection failed: " . $connection->connect_error);
+            }
+
+            // Retrieve all users from the database
+            $sql = "SELECT id, email FROM user";
+            $result = $connection->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    echo "<option value='" . $row['id'] . "'>" . $row['email'] . "</option>";
+                }
+            } else {
+                echo "<option value=''>No users found</option>";
+            }
+
+            $connection->close();
+            ?>
+        </select><br>
+        <label>Subject:</label><br>
+        <input type="text" name="subject" required><br>
+        <label>Content:</label><br>
+        <textarea name="content" rows="4" required></textarea><br>
+        <input type="submit" value="Send">
+    </form>
+</body>
+
+</html>
